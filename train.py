@@ -2,10 +2,29 @@ import sys, platform
 import numpy as np
 
 from scores import Scores
+from ddpg_agent import Agent
 from unityagents import UnityEnvironment
 
 
-def train(env, epoch):
+default_hparams = {
+    'buffer_size':int(1e5),  # replay buffer size
+    'batch_size':128,        # minibatch size
+    'gamma':0.99,            # discount factor
+    'tau':1e-3,              # for soft update of target parameters'
+    'lr': { 
+        'actor':1e-4,        # learning rate of the actor 
+        'critic':1e-3,       # learning rate of the critic
+    },
+    'weight_decay':0,        # L2 weight decay
+
+    'hidden_layers': {
+        'actor': (400,300),
+        'critic': (400,300),
+    }
+}
+
+
+def train(env, epoch, hparams):
     # get the default brain
     brain_name = env.brain_names[0]
     brain = env.brains[brain_name]
@@ -20,7 +39,7 @@ def train(env, epoch):
         # size of each action
         action_size = brain.vector_action_space_size
         states = env_info.vector_observations                  # get the current state (for each agent)
-        
+
         # initialize the score (for each agent)
         epoch_score = np.zeros(num_agents)
         done = False
@@ -46,4 +65,4 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         epoch = int(sys.argv[1])
     
-    train(env,epoch)
+    train(env,epoch, default_hparams)
