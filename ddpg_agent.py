@@ -126,6 +126,14 @@ class Agent():
         for target_param, local_param in zip(target_model.parameters(), local_model.parameters()):
             target_param.data.copy_(self.tau*local_param.data + (1.0-self.tau)*target_param.data)
 
+    def save_checkpoint(prefix):
+        torch.save(self.actor_local.state_dict(), f'{prefix}_actor.pth')
+        torch.save(self.critic_local.state_dict(), f'{prefix}_critic.pth')
+
+    def load_checkpoint(prefix):
+        self.actor_local.load_state_dict(torch.load(f'{prefix}_actor.pth'))
+        self.critic_local.load_state_dict(torch.load(f'{prefix}_critic.pth'))
+
 class OUNoise:
     """Ornstein-Uhlenbeck process."""
 
