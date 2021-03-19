@@ -33,13 +33,13 @@ class Agent():
         hidden_layers = hparams['hidden_layers']
         # Actor Network (w/ Target Network)
 
-        self.actor_local = Actor(state_size, action_size, random_seed, *hidden_layers['actor']).to(device)
-        self.actor_target = Actor(state_size, action_size, random_seed, *hidden_layers['actor']).to(device)
+        self.actor_local = Actor(state_size, action_size, random_seed, hidden_layers['actor']).to(device)
+        self.actor_target = Actor(state_size, action_size, random_seed, hidden_layers['actor']).to(device)
         self.actor_optimizer = optim.Adam(self.actor_local.parameters(), lr=hparams['lr']['actor'])
 
         # Critic Network (w/ Target Network)
-        self.critic_local = Critic(state_size, action_size, random_seed, *hidden_layers['critic']).to(device)
-        self.critic_target = Critic(state_size, action_size, random_seed, *hidden_layers['critic']).to(device)
+        self.critic_local = Critic(state_size, action_size, random_seed, hprarms['critic_activate'],hidden_layers['critic']).to(device)
+        self.critic_target = Critic(state_size, action_size, random_seed, hprarms['critic_activate'], hidden_layers['critic']).to(device)
         self.critic_optimizer = optim.Adam(self.critic_local.parameters(), lr=hparams['lr']['critic'], weight_decay=hparams['weight_decay'])
 
         # Noise process

@@ -18,9 +18,10 @@ default_hparams = {
     'weight_decay':0,        # L2 weight decay
 
     'hidden_layers': {
-        'actor': (400,300),
-        'critic': (400,300),
-    }
+        'actor': [ 400,300 ],
+        'critic': [ 400,300 ],
+    },
+    'critic_activate': 'relu'
 }
 
 
