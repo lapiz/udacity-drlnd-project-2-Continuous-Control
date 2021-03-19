@@ -32,6 +32,9 @@ class Actor(nn.Module):
             input_size = layer
         
         self.layers.append( nn.Linear( input_size, action_size ) )
+
+        for i in range(len(self.layers)):
+            setattr(self, f'layer{i}', self.layers[i])
         self.reset_parameters()
 
     def reset_parameters(self):
@@ -80,6 +83,10 @@ class Critic(nn.Module):
             input_size = layer            
 
         self.layers.append( nn.Linear(input_size, 1))
+
+        for i in range(len(self.layers)):
+            setattr(self, f'layer{i}', self.layers[i])
+
         self.reset_parameters()
 
     def reset_parameters(self):
@@ -90,7 +97,7 @@ class Critic(nn.Module):
 
     def forward(self, state, action):
         """Build a critic (value) network that maps (state, action) pairs -> Q-values."""
-        xs = self.func(self.layers[0])
+        xs = self.func(self.layers[0](state))
         x = torch.cat((xs, action), dim=1)
 
         for layer in self.layers[1:-1]:

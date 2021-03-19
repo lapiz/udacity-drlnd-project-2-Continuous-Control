@@ -13,7 +13,16 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 class Agent():
     """Interacts with and learns from the environment."""
-    
+    initiailized = False
+    memory = None
+    actor_local = None
+    actor_target = None
+    actor_optimizer = None
+
+    critic_local = None
+    critic_target = None
+    critic_optimizer = None
+
     def __init__(self, state_size, action_size, random_seed, hparams):
         """Initialize an Agent object.
         
@@ -31,40 +40,46 @@ class Agent():
         self.tau = hparams['tau']
 
         hidden_layers = hparams['hidden_layers']
-        # Actor Network (w/ Target Network)
 
-        self.actor_local = Actor(state_size, action_size, random_seed, hidden_layers['actor']).to(device)
-        self.actor_target = Actor(state_size, action_size, random_seed, hidden_layers['actor']).to(device)
-        self.actor_optimizer = optim.Adam(self.actor_local.parameters(), lr=hparams['lr']['actor'])
+        if Agent.initiailized is False:
+            # Actor Network (w/ Target Network)
+            Agent.actor_local = Actor(state_size, action_size, random_seed, hidden_layers['actor']).to(device)
+            Agent.actor_target = Actor(state_size, action_size, random_seed, hidden_layers['actor']).to(device)
+            Agent.actor_optimizer = optim.Adam(Agent.actor_local.parameters(), lr=hparams['lr']['actor'])
 
-        # Critic Network (w/ Target Network)
-        self.critic_local = Critic(state_size, action_size, random_seed, hprarms['critic_activate'],hidden_layers['critic']).to(device)
-        self.critic_target = Critic(state_size, action_size, random_seed, hprarms['critic_activate'], hidden_layers['critic']).to(device)
-        self.critic_optimizer = optim.Adam(self.critic_local.parameters(), lr=hparams['lr']['critic'], weight_decay=hparams['weight_decay'])
+            # Critic Network (w/ Target Network)
+            Agent.critic_local = Critic(state_size, action_size, random_seed, hparams['critic_activate'],hidden_layers['critic']).to(device)
+            Agent.critic_target = Critic(state_size, action_size, random_seed, hparams['critic_activate'], hidden_layers['critic']).to(device)
+            Agent.critic_optimizer = optim.Adam(Agent.critic_local.parameters(), lr=hparams['lr']['critic'], weight_decay=hparams['weight_decay'])
+
+
+            # Replay memory
+            Agent.memory = ReplayBuffer(action_size, hparams['buffer_size'], hparams['batch_size'], random_seed)
+
+            Agent.initiailized = True
+
 
         # Noise process
         self.noise = OUNoise(action_size, random_seed)
 
-        # Replay memory
-        self.memory = ReplayBuffer(action_size, hparams['buffer_size'], hparams['batch_size'], random_seed)
     
     def step(self, state, action, reward, next_state, done):
         """Save experience in replay memory, and use random sample from buffer to learn."""
         # Save experience / reward
-        self.memory.add(state, action, reward, next_state, done)
+        Agent.memory.add(state, action, reward, next_state, done)
 
         # Learn, if enough samples are available in memory
-        if self.memory.is_enough_memory():
-            experiences = self.memory.sample()
+        if Agent.memory.is_enough_memory():
+            experiences = Agent.memory.sample()
             self.learn(experiences)
 
     def act(self, state, add_noise=True):
         """Returns actions for given state as per current policy."""
         state = torch.from_numpy(state).float().to(device)
-        self.actor_local.eval()
+        Agent.actor_local.eval()
         with torch.no_grad():
-            action = self.actor_local(state).cpu().data.numpy()
-        self.actor_local.train()
+            action = Agent.actor_local(state).cpu().data.numpy()
+        Agent.actor_local.train()
         if add_noise:
             action += self.noise.sample()
         return np.clip(action, -1, 1)
@@ -88,30 +103,30 @@ class Agent():
 
         # ---------------------------- update critic ---------------------------- #
         # Get predicted next-state actions and Q values from target models
-        actions_next = self.actor_target(next_states)
-        Q_targets_next = self.critic_target(next_states, actions_next)
+        actions_next = Agent.actor_target(next_states)
+        Q_targets_next = Agent.critic_target(next_states, actions_next)
         # Compute Q targets for current states (y_i)
         Q_targets = rewards + (self.gamma * Q_targets_next * (1 - dones))
         # Compute critic loss
-        Q_expected = self.critic_local(states, actions)
+        Q_expected = Agent.critic_local(states, actions)
         critic_loss = F.mse_loss(Q_expected, Q_targets)
         # Minimize the loss
-        self.critic_optimizer.zero_grad()
+        Agent.critic_optimizer.zero_grad()
         critic_loss.backward()
-        self.critic_optimizer.step()
+        Agent.critic_optimizer.step()
 
         # ---------------------------- update actor ---------------------------- #
         # Compute actor loss
-        actions_pred = self.actor_local(states)
-        actor_loss = -self.critic_local(states, actions_pred).mean()
+        actions_pred = Agent.actor_local(states)
+        actor_loss = -Agent.critic_local(states, actions_pred).mean()
         # Minimize the loss
-        self.actor_optimizer.zero_grad()
+        Agent.actor_optimizer.zero_grad()
         actor_loss.backward()
-        self.actor_optimizer.step()
+        Agent.actor_optimizer.step()
 
         # ----------------------- update target networks ----------------------- #
-        self.soft_update(self.critic_local, self.critic_target)
-        self.soft_update(self.actor_local, self.actor_target)                     
+        self.soft_update(Agent.critic_local, Agent.critic_target)
+        self.soft_update(Agent.actor_local, Agent.actor_target)                     
 
     def soft_update(self, local_model, target_model):
         """Soft update model parameters.
@@ -127,12 +142,12 @@ class Agent():
             target_param.data.copy_(self.tau*local_param.data + (1.0-self.tau)*target_param.data)
 
     def save_checkpoint(prefix):
-        torch.save(self.actor_local.state_dict(), f'{prefix}_actor.pth')
-        torch.save(self.critic_local.state_dict(), f'{prefix}_critic.pth')
+        torch.save(Agent.actor_local.state_dict(), f'{prefix}_actor.pth')
+        torch.save(Agent.critic_local.state_dict(), f'{prefix}_critic.pth')
 
     def load_checkpoint(prefix):
-        self.actor_local.load_state_dict(torch.load(f'{prefix}_actor.pth'))
-        self.critic_local.load_state_dict(torch.load(f'{prefix}_critic.pth'))
+        Agent.actor_local.load_state_dict(torch.load(f'{prefix}_actor.pth'))
+        Agent.critic_local.load_state_dict(torch.load(f'{prefix}_critic.pth'))
 
 class OUNoise:
     """Ornstein-Uhlenbeck process."""
