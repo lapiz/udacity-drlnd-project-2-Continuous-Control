@@ -94,5 +94,5 @@ class Critic(nn.Module):
         x = torch.cat((xs, action), dim=1)
 
         for layer in self.layers[1:-1]:
-            x = self.func(later(x))
+            x = self.func(layer(x))
         return self.layers[-1](x)
