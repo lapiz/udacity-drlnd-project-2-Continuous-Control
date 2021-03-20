@@ -53,6 +53,8 @@ def train(env, hparams ):
                 break
         if scores.AddScore(np.mean(epoch_score)) is True:
             break
+
+    Agent.save_checkpoint(prefix)
     scores.FlushLog(prefix, False)
 
 
@@ -65,7 +67,7 @@ if __name__ == '__main__':
         hparams = json.load(f)
 
     print(hparams)
-    fn = 'udacity-drlnd-project-2-Continuous-Control/Reacher.app'
+    fn = 'Reacher.app'
     if platform.system() == 'Linux':
         fn = '../Reacher_Linux_NoVis/Reacher.x86_64'
     env = UnityEnvironment(file_name=fn)    

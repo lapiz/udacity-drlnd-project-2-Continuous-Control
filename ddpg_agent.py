@@ -148,10 +148,12 @@ class Agent():
         for target_param, local_param in zip(target_model.parameters(), local_model.parameters()):
             target_param.data.copy_(self.tau*local_param.data + (1.0-self.tau)*target_param.data)
 
+    @staticmethod
     def save_checkpoint(prefix):
         torch.save(Agent.actor_local.state_dict(), f'{prefix}_actor.pth')
         torch.save(Agent.critic_local.state_dict(), f'{prefix}_critic.pth')
 
+    @staticmethod
     def load_checkpoint(prefix):
         Agent.actor_local.load_state_dict(torch.load(f'{prefix}_actor.pth'))
         Agent.critic_local.load_state_dict(torch.load(f'{prefix}_critic.pth'))
