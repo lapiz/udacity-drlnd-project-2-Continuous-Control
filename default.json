@@ -1,0 +1,28 @@
+{
+    "output": "default",
+    "epoch": 1000,
+    "scores": {
+        "expectation": 30,
+        "window_size": 100,
+        "check_solved": true
+    },
+    "t_max": 300,
+    "buffer_size":100000,
+    "batch_size":128,
+    "gamma":0.99,
+    "tau":1e-3,
+    "lr": { 
+        "actor":1e-4,
+        "critic":1e-3
+    },
+    "weight_decay":0,
+
+    "learn_per_step": 20,
+    "update_times": 10,
+    
+    "hidden_layers": {
+        "actor": [ 256, 256 ],
+        "critic": [ 256, 256 ]
+    },
+    "critic_activate": "relu"
+}

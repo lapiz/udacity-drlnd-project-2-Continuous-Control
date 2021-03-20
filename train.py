@@ -1,36 +1,9 @@
-import sys, platform
+import sys, platform, json
 import numpy as np
 
 from scores import Scores
 from ddpg_agent import Agent
 from unityagents import UnityEnvironment
-
-
-default_hparams = {
-    'output': 'default',     # output file prefix
-    'epoch': 1000,
-    'scores': {
-        'expectation': 10,
-        'window_size': 3,
-        'check_solved': True,
-    },
-    't_max': 300,
-    'buffer_size':int(1e5),  # replay buffer size
-    'batch_size':128,        # minibatch size
-    'gamma':0.99,            # discount factor
-    'tau':1e-3,              # for soft update of target parameters'
-    'lr': { 
-        'actor':1e-4,        # learning rate of the actor 
-        'critic':1e-3,       # learning rate of the critic
-    },
-    'weight_decay':0,        # L2 weight decay
-
-    'hidden_layers': {
-        'actor': [ 400,300 ],
-        'critic': [ 400,300 ],
-    },
-    'critic_activate': 'relu'
-}
 
 def train(env, hparams ):
     # get the default brain
@@ -74,7 +47,7 @@ def train(env, hparams ):
             epoch_score += env_info.rewards                         # update the score (for each agent)
     
             for i in range(num_agents):
-                agents[i].step(states[i], actions[i], env_info.rewards[i], next_states[i], dones[i]) 
+                agents[i].step(t, states[i], actions[i], env_info.rewards[i], next_states[i], dones[i]) 
 
             if np.any(dones):
                 break
@@ -83,12 +56,16 @@ def train(env, hparams ):
 
 
 if __name__ == '__main__':
+    config = 'default.json'
+    if len(sys.argv) > 1:
+        config = sys.argv[1]
+
+    with open( config, 'r', encoding='utf-8') as f:
+        hparams = json.load(f)
+
+    print(hparams)
     fn = 'udacity-drlnd-project-2-Continuous-Control/Reacher.app'
     if platform.system() == 'Linux':
-        fn = 'Reacher_Linux_NoVis/Reacher.x86_64'
+        fn = '../Reacher_Linux_NoVis/Reacher.x86_64'
     env = UnityEnvironment(file_name=fn)    
-    if len(sys.argv) > 1:
-        hparams = json.load(sys.argv[1])
-    else:
-        hparams = default_hparams   
-    train(env, default_hparams)
+    train(env, hparams)

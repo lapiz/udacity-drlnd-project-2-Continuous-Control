@@ -39,6 +39,9 @@ class Agent():
         self.gamma = hparams['gamma']
         self.tau = hparams['tau']
 
+        self.learn_per_step = hparams['learn_per_step']
+        self.update_times = hparams['update_times']
+
         hidden_layers = hparams['hidden_layers']
 
         if Agent.initiailized is False:
@@ -63,15 +66,19 @@ class Agent():
         self.noise = OUNoise(action_size, random_seed)
 
     
-    def step(self, state, action, reward, next_state, done):
+    def step( self, steps, state, action, reward, next_state, done):
         """Save experience in replay memory, and use random sample from buffer to learn."""
         # Save experience / reward
         Agent.memory.add(state, action, reward, next_state, done)
 
+        if steps % self.learn_per_step != 0:
+            return
+
         # Learn, if enough samples are available in memory
         if Agent.memory.is_enough_memory():
-            experiences = Agent.memory.sample()
-            self.learn(experiences)
+            for _ in range(self.update_times):
+                experiences = Agent.memory.sample()
+                self.learn(experiences)
 
     def act(self, state, add_noise=True):
         """Returns actions for given state as per current policy."""
