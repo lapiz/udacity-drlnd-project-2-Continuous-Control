@@ -51,7 +51,8 @@ def train(env, hparams ):
 
             if np.any(dones):
                 break
-        scores.AddScore(np.mean(epoch_score))
+        if scores.AddScore(np.mean(epoch_score)) is True:
+            break
     scores.FlushLog(prefix, False)
 
 
