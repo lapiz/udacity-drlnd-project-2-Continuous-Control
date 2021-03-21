@@ -129,5 +129,5 @@ dmypy.json
 .pyre/
 
 
-Reacher.app
+Reacher*
 result/
