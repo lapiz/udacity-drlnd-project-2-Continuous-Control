@@ -48,10 +48,12 @@ def train(env, hparams ):
             env_info = env.step(actions)[brain_name]           # send all actions to tne environment
             next_states = env_info.vector_observations         # get next state (for each agent)
             dones = env_info.local_done                        # see if episode finished
-            epoch_score += env_info.rewards                         # update the score (for each agent)
     
             for i in range(num_agents):
                 agents[i].step(t, states[i], actions[i], env_info.rewards[i], next_states[i], dones[i]) 
+
+            states = next_states
+            epoch_score += env_info.rewards 
 
             if t % 100 == 0:
                 print('Timestep {}\tScore: {:.2f}\tmin: {:.2f}\tmax: {:.2f}' .format(t, np.mean(epoch_score), np.min(epoch_score), np.max(epoch_score))) 
