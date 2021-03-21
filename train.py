@@ -78,6 +78,6 @@ if __name__ == '__main__':
     print(hparams)
     fn = 'Reacher.app'
     if platform.system() == 'Linux':
-        fn = '../Reacher_Linux_NoVis/Reacher.x86_64'
+        fn = 'Reacher_Linux_NoVis_20/Reacher.x86_64'
     env = UnityEnvironment(file_name=fn)    
     train(env, hparams)
