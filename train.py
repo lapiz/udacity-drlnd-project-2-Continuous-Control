@@ -32,6 +32,9 @@ def train(env, hparams ):
         env_info = env.reset(train_mode=True)[brain_name]     # reset the environment    
         # number of agents
         num_agents = len(env_info.agents)
+        
+        for agent in agents:
+            agent.reset()
     
         # size of each action
         action_size = brain.vector_action_space_size
