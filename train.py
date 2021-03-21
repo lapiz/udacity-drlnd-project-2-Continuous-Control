@@ -22,9 +22,10 @@ def train(env, hparams ):
     states = env_info.vector_observations                  # get the current state (for each agent)
     state_size = states.shape[1]
 
+    Agent.set_hparams(state_size, action_size, 0, hparams)
     agents = []
     for _ in range(num_agents):
-        agents.append( Agent(state_size=state_size, action_size=action_size, random_seed=2, hparams=hparams))
+        agents.append( Agent(action_size, 0))
     
     prefix = f'result/{hparams["output"]}'
 
@@ -51,6 +52,9 @@ def train(env, hparams ):
     
             for i in range(num_agents):
                 agents[i].step(t, states[i], actions[i], env_info.rewards[i], next_states[i], dones[i]) 
+
+            if t % 100 == 0:
+                print('Timestep {}\tScore: {:.2f}\tmin: {:.2f}\tmax: {:.2f}' .format(t, np.mean(epoch_score), np.min(epoch_score), np.max(epoch_score))) 
 
             if np.any(dones):
                 break

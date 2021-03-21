@@ -6,14 +6,14 @@
         "window_size": 100,
         "check_solved": true
     },
-    "t_max": 300,
+    "t_max": 1000,
     "buffer_size":100000,
     "batch_size":128,
     "gamma":0.99,
     "tau":1e-3,
     "lr": { 
         "actor":1e-4,
-        "critic":1e-3
+        "critic":1e-4
     },
     "weight_decay":0,
 
@@ -21,8 +21,7 @@
     "update_times": 10,
     
     "hidden_layers": {
-        "actor": [ 256, 256 ],
-        "critic": [ 256, 256 ]
-    },
-    "critic_activate": "relu"
+        "actor": [ 256, 128 ],
+        "critic": [ 256, 128 ]
+    }
 }

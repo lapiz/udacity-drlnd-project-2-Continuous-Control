@@ -12,94 +12,62 @@ def hidden_init(layer):
 class Actor(nn.Module):
     """Actor (Policy) Model."""
 
-    def __init__(self, state_size, action_size, seed, hidden_layers): #,  fc1_units=400, fc2_units=300):
+    def __init__(self, state_size, action_size, seed, hidden_layers):
         """Initialize parameters and build model.
         Params
         ======
             state_size (int): Dimension of each state
             action_size (int): Dimension of each action
             seed (int): Random seed
-            hidden_layers (list) : number of nodes of hiddne layers
+            hidden_layers (list): list of number of nodes in hidden layers
         """
         super(Actor, self).__init__()
         self.seed = torch.manual_seed(seed)
-
-        self.layers = []
-
-        input_size = state_size
-        for layer in hidden_layers:
-            self.layers.append( nn.Linear( input_size, layer) )
-            input_size = layer
-        
-        self.layers.append( nn.Linear( input_size, action_size ) )
-
-        for i in range(len(self.layers)):
-            setattr(self, f'layer{i}', self.layers[i])
+        self.fc1 = nn.Linear(state_size, hidden_layers[0])
+        self.fc2 = nn.Linear(hidden_layers[0], hidden_layers[1])
+        self.fc3 = nn.Linear(hidden_layers[1], action_size)
         self.reset_parameters()
 
     def reset_parameters(self):
-        for layer in self.layers[:-1]:
-            layer.weight.data.uniform_(*hidden_init(layer))
-
-        self.layers[-1].weight.data.uniform_(-3e-3, 3e-3)
+        self.fc1.weight.data.uniform_(*hidden_init(self.fc1))
+        self.fc2.weight.data.uniform_(*hidden_init(self.fc2))
+        self.fc3.weight.data.uniform_(-3e-3, 3e-3)
 
     def forward(self, state):
         """Build an actor (policy) network that maps states -> actions."""
-        x = state
-        for layer in self.layers[:-1]:
-            x = F.relu(layer(x))
-
-        return F.tanh(self.layers[-1](x))
+        x = F.relu(self.fc1(state))
+        x = F.relu(self.fc2(x))
+        return F.tanh(self.fc3(x))
 
 
 class Critic(nn.Module):
     """Critic (Value) Model."""
 
-    def __init__(self, state_size, action_size, seed, func, hidden_layers):
+    def __init__(self, state_size, action_size, seed, hidden_layers):
         """Initialize parameters and build model.
         Params
         ======
             state_size (int): Dimension of each state
             action_size (int): Dimension of each action
             seed (int): Random seed
-            func (function) : activate function
-            hidden_layers (list) : number of nodes of hiddne layers
+            hidden_layers (list): list of number of nodes in hidden layers
         """
         super(Critic, self).__init__()
         self.seed = torch.manual_seed(seed)
-
-        if func == 'relu':
-            self.func = F.relu
-        elif func == 'leaky_relu':
-            self.func = F.leaky_relu 
-
-        self.layers = []
-
-        self.layers.append( nn.Linear( state_size, hidden_layers[0]))
-
-        input_size = hidden_layers[0] + action_size
-        for layer in hidden_layers[1:]:
-            self.layers.append( nn.Linear( input_size, layer) )
-            input_size = layer            
-
-        self.layers.append( nn.Linear(input_size, 1))
-
-        for i in range(len(self.layers)):
-            setattr(self, f'layer{i}', self.layers[i])
-
+        self.fcs1 = nn.Linear(state_size, hidden_layers[0])
+        self.fc2 = nn.Linear(hidden_layers[0]+action_size, hidden_layers[1])
+        self.fc3 = nn.Linear(hidden_layers[1], 1)
         self.reset_parameters()
 
     def reset_parameters(self):
-        for layer in self.layers[:-1]:
-            layer.weight.data.uniform_(*hidden_init(layer))
-
-        self.layers[-1].weight.data.uniform_(-3e-3, 3e-3)
+        self.fcs1.weight.data.uniform_(*hidden_init(self.fcs1))
+        self.fc2.weight.data.uniform_(*hidden_init(self.fc2))
+        self.fc3.weight.data.uniform_(-3e-3, 3e-3)
 
     def forward(self, state, action):
         """Build a critic (value) network that maps (state, action) pairs -> Q-values."""
-        xs = self.func(self.layers[0](state))
+        xs = F.leaky_relu(self.fcs1(state))
         x = torch.cat((xs, action), dim=1)
+        x = F.leaky_relu(self.fc2(x))
+        return self.fc3(x)
 
-        for layer in self.layers[1:-1]:
-            x = self.func(layer(x))
-        return self.layers[-1](x)
