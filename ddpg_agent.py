@@ -76,11 +76,12 @@ class Agent():
 
     @staticmethod
     def save(prefix):
-        pass
+        torch.save(Agent.shared_actor_local.state_dict(), f'{prefix}_actor.pth')
+        torch.save(Agent.shared_critic_local.state_dict(), f'{prefix}_critic.pth')
 
     @staticmethod
     def load(prefix):
-        pass
+        Agent.shared_actor_local.load_state_dict(torch.load(f'{prefix}_actor.pth'))
 
     def step(self, t, state, action, reward, next_state, done):
         """Save experience in replay memory, and use random sample from buffer to learn."""
