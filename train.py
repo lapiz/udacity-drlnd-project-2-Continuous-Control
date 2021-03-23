@@ -1,5 +1,6 @@
 import sys, platform, json
 import torch
+import random
 import numpy as np
 
 from scores import Scores
