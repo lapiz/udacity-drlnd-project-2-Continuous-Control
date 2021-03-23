@@ -31,7 +31,6 @@ class Agent():
         Params
         ======
             action_size (int): dimension of each action
-            random_seed (int): random seed
         """
         # Actor Network (w/ Target Network)
         self.actor_local = Agent.shared_actor_local
@@ -44,7 +43,7 @@ class Agent():
         self.critic_optimizer = Agent.shared_critic_optimizer
 
         # Noise process
-        self.noise = OUNoise(action_size, Agent.shared_random_seed)
+        self.noise = OUNoise(action_size)
 
         # Replay memory
         self.memory = Agent.shared_memory
@@ -58,21 +57,20 @@ class Agent():
         Agent.gamma = hparams['gamma']
         Agent.shared_learn_per_step = hparams['learn_per_step']
         Agent.shared_update_times = hparams['update_times']
-        Agent.shared_random_seed = hparams['seed']
 
         lr = hparams['lr']
         actor_hidden = hparams['hidden_layers']['actor']
 
-        Agent.shared_actor_local = Actor(state_size, action_size, Agent.shared_random_seed, actor_hidden).to(device)
-        Agent.shared_actor_target = Actor(state_size, action_size, Agent.shared_random_seed, actor_hidden).to(device)
+        Agent.shared_actor_local = Actor(state_size, action_size, actor_hidden).to(device)
+        Agent.shared_actor_target = Actor(state_size, action_size, actor_hidden).to(device)
         Agent.shared_actor_optimizer = optim.Adam(Agent.shared_actor_local.parameters(), lr=lr['actor'])
 
         critic_hidden = hparams['hidden_layers']['critic']
-        Agent.shared_critic_local = Critic(state_size, action_size, Agent.shared_random_seed, critic_hidden).to(device)
-        Agent.shared_critic_target = Critic(state_size, action_size, Agent.shared_random_seed, critic_hidden).to(device)
+        Agent.shared_critic_local = Critic(state_size, action_size, critic_hidden).to(device)
+        Agent.shared_critic_target = Critic(state_size, action_size, critic_hidden).to(device)
         Agent.shared_critic_optimizer = optim.Adam(Agent.shared_critic_local.parameters(), lr=lr['critic'], weight_decay=hparams['weight_decay'])
         
-        Agent.shared_memory = ReplayBuffer(action_size, hparams['buffer_size'], Agent.batch_size, Agent.shared_random_seed)
+        Agent.shared_memory = ReplayBuffer(action_size, hparams['buffer_size'], Agent.batch_size)
 
 
     @staticmethod
@@ -169,12 +167,11 @@ class Agent():
 class OUNoise:
     """Ornstein-Uhlenbeck process."""
 
-    def __init__(self, size, seed, mu=0., theta=0.15, sigma=0.2):
+    def __init__(self, size, mu=0., theta=0.15, sigma=0.2):
         """Initialize parameters and noise process."""
         self.mu = mu * np.ones(size)
         self.theta = theta
         self.sigma = sigma
-        self.seed = random.seed(seed)
         self.reset()
 
     def reset(self):
@@ -191,7 +188,7 @@ class OUNoise:
 class ReplayBuffer:
     """Fixed-size buffer to store experience tuples."""
 
-    def __init__(self, action_size, buffer_size, batch_size, seed):
+    def __init__(self, action_size, buffer_size, batch_size):
         """Initialize a ReplayBuffer object.
         Params
         ======
@@ -202,7 +199,6 @@ class ReplayBuffer:
         self.memory = deque(maxlen=buffer_size)  # internal memory (deque)
         self.batch_size = batch_size
         self.experience = namedtuple("Experience", field_names=["state", "action", "reward", "next_state", "done"])
-        self.seed = random.seed(seed)
     
     def add(self, state, action, reward, next_state, done):
         """Add a new experience to memory."""

@@ -12,17 +12,15 @@ def hidden_init(layer):
 class Actor(nn.Module):
     """Actor (Policy) Model."""
 
-    def __init__(self, state_size, action_size, seed, hidden_layers):
+    def __init__(self, state_size, action_size, hidden_layers):
         """Initialize parameters and build model.
         Params
         ======
             state_size (int): Dimension of each state
             action_size (int): Dimension of each action
-            seed (int): Random seed
             hidden_layers (list): list of number of nodes in hidden layers
         """
         super(Actor, self).__init__()
-        self.seed = torch.manual_seed(seed)
         self.fc1 = nn.Linear(state_size, hidden_layers[0])
         self.fc2 = nn.Linear(hidden_layers[0], hidden_layers[1])
         self.fc3 = nn.Linear(hidden_layers[1], action_size)
@@ -43,17 +41,15 @@ class Actor(nn.Module):
 class Critic(nn.Module):
     """Critic (Value) Model."""
 
-    def __init__(self, state_size, action_size, seed, hidden_layers):
+    def __init__(self, state_size, action_size, hidden_layers):
         """Initialize parameters and build model.
         Params
         ======
             state_size (int): Dimension of each state
             action_size (int): Dimension of each action
-            seed (int): Random seed
             hidden_layers (list): list of number of nodes in hidden layers
         """
         super(Critic, self).__init__()
-        self.seed = torch.manual_seed(seed)
         self.fcs1 = nn.Linear(state_size, hidden_layers[0])
         self.fc2 = nn.Linear(hidden_layers[0]+action_size, hidden_layers[1])
         self.fc3 = nn.Linear(hidden_layers[1], 1)

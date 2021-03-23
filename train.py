@@ -5,7 +5,19 @@ from scores import Scores
 from ddpg_agent import Agent
 from unityagents import UnityEnvironment
 
-def train(env, hparams ):
+def train(env, hparams):
+    # bind seeds
+    random_seed = hparams['seed']
+    torch.manual_seed(random_seed)
+    torch.cuda.manual_seed(random_seed)
+    torch.cuda.manual_seed_all(random_seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+    np.random.seed(random_seed)
+    random.seed(random_seed)
+
+
+
     # get the default brain
     brain_name = env.brain_names[0]
     brain = env.brains[brain_name]
@@ -22,6 +34,7 @@ def train(env, hparams ):
     states = env_info.vector_observations                  # get the current state (for each agent)
     state_size = states.shape[1]
 
+    
     Agent.set_hparams(state_size, action_size, hparams)
     agents = []
     for _ in range(num_agents):
