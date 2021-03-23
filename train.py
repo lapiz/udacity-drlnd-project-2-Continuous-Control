@@ -1,4 +1,5 @@
 import sys, platform, json
+import torch
 import numpy as np
 
 from scores import Scores
@@ -6,7 +7,8 @@ from ddpg_agent import Agent
 from unityagents import UnityEnvironment
 
 def train(env, hparams):
-    # bind seeds
+    # randomness (https://pytorch.org/docs/stable/notes/randomness.html)
+
     random_seed = hparams['seed']
     torch.manual_seed(random_seed)
     torch.cuda.manual_seed(random_seed)
