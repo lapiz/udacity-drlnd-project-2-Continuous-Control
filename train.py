@@ -43,7 +43,7 @@ def train(env, hparams ):
 
         # initialize the score (for each agent)
         epoch_score = np.zeros(num_agents)
-        for t in range(hparams['t_max']):
+        for t in range(1, hparams['t_max']+1):
             actions = np.array( [agents[i].act(states[i]) for i in range(num_agents) ])
             env_info = env.step(actions)[brain_name]           # send all actions to tne environment
             next_states = env_info.vector_observations         # get next state (for each agent)
@@ -55,15 +55,16 @@ def train(env, hparams ):
             states = next_states
             epoch_score += env_info.rewards 
 
-            if t % 100 == 0:
-                print('Timestep {}\tScore: {:.2f}\tmin: {:.2f}\tmax: {:.2f}' .format(t, np.mean(epoch_score), np.min(epoch_score), np.max(epoch_score))) 
+            if t % 20 == 0:
+                print('\rTimestep {}\tScore: {:.2f}\tmin: {:.2f}\tmax: {:.2f}' .format(t, np.mean(epoch_score), np.min(epoch_score), np.max(epoch_score)), end='') 
 
             if np.any(dones):
                 break
+        print('')
         if scores.AddScore(np.mean(epoch_score)) is True:
             break
 
-    Agent.save_checkpoint(prefix)
+    Agent.save(prefix)
     scores.FlushLog(prefix, False)
 
 
