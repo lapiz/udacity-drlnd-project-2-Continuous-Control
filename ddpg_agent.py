@@ -64,7 +64,7 @@ class Agent():
         actor_hidden = hparams['hidden_layers']['actor']
 
         Agent.shared_actor_local = Actor(state_size, action_size, Agent.shared_random_seed, actor_hidden).to(device)
-        Agent.shared_actor_target = Actor(state_size, action_size, Agent.shared_random_seed actor_hidden).to(device)
+        Agent.shared_actor_target = Actor(state_size, action_size, Agent.shared_random_seed, actor_hidden).to(device)
         Agent.shared_actor_optimizer = optim.Adam(Agent.shared_actor_local.parameters(), lr=lr['actor'])
 
         critic_hidden = hparams['hidden_layers']['critic']
