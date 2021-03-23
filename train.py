@@ -22,10 +22,10 @@ def train(env, hparams ):
     states = env_info.vector_observations                  # get the current state (for each agent)
     state_size = states.shape[1]
 
-    Agent.set_hparams(state_size, action_size, 0, hparams)
+    Agent.set_hparams(state_size, action_size, hparams)
     agents = []
     for _ in range(num_agents):
-        agents.append( Agent(action_size, 0))
+        agents.append( Agent(action_size))
     
     prefix = f'result/{hparams["output"]}'
 

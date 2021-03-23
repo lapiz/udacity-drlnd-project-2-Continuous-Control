@@ -25,7 +25,7 @@ class Agent():
 
     shared_learn_per_step = 0
     shared_update_times = 0
-    def __init__(self, action_size, random_seed):
+    def __init__(self, action_size):
         """Initialize an Agent object.
         
         Params
@@ -44,13 +44,13 @@ class Agent():
         self.critic_optimizer = Agent.shared_critic_optimizer
 
         # Noise process
-        self.noise = OUNoise(action_size, random_seed)
+        self.noise = OUNoise(action_size, Agent.shared_random_seed)
 
         # Replay memory
         self.memory = Agent.shared_memory
     
     @staticmethod
-    def set_hparams(state_size, action_size, random_seed, hparams):
+    def set_hparams(state_size, action_size, hparams):
         Agent.hparams = hparams
 
         Agent.batch_size = hparams['batch_size']
@@ -58,20 +58,21 @@ class Agent():
         Agent.gamma = hparams['gamma']
         Agent.shared_learn_per_step = hparams['learn_per_step']
         Agent.shared_update_times = hparams['update_times']
+        Agent.shared_random_seed = hparams['seed']
 
         lr = hparams['lr']
         actor_hidden = hparams['hidden_layers']['actor']
 
-        Agent.shared_actor_local = Actor(state_size, action_size, random_seed, actor_hidden).to(device)
-        Agent.shared_actor_target = Actor(state_size, action_size, random_seed, actor_hidden).to(device)
+        Agent.shared_actor_local = Actor(state_size, action_size, Agent.shared_random_seed, actor_hidden).to(device)
+        Agent.shared_actor_target = Actor(state_size, action_size, Agent.shared_random_seed actor_hidden).to(device)
         Agent.shared_actor_optimizer = optim.Adam(Agent.shared_actor_local.parameters(), lr=lr['actor'])
 
         critic_hidden = hparams['hidden_layers']['critic']
-        Agent.shared_critic_local = Critic(state_size, action_size, random_seed, critic_hidden).to(device)
-        Agent.shared_critic_target = Critic(state_size, action_size, random_seed, critic_hidden).to(device)
+        Agent.shared_critic_local = Critic(state_size, action_size, Agent.shared_random_seed, critic_hidden).to(device)
+        Agent.shared_critic_target = Critic(state_size, action_size, Agent.shared_random_seed, critic_hidden).to(device)
         Agent.shared_critic_optimizer = optim.Adam(Agent.shared_critic_local.parameters(), lr=lr['critic'], weight_decay=hparams['weight_decay'])
         
-        Agent.shared_memory = ReplayBuffer(action_size, hparams['buffer_size'], Agent.batch_size, random_seed)
+        Agent.shared_memory = ReplayBuffer(action_size, hparams['buffer_size'], Agent.batch_size, Agent.shared_random_seed)
 
 
     @staticmethod

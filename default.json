@@ -1,5 +1,6 @@
 {
     "output": "default",
+    "seed": 0,
     "epoch": 1000,
     "scores": {
         "expectation": 30,
