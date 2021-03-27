@@ -8,7 +8,7 @@
         "check_solved": true
     },
     "t_max": 1000,
-    "buffer_size":2000000,
+    "buffer_size":1000000,
     "batch_size":128,
     "gamma":0.99,
     "tau":1e-3,
@@ -16,7 +16,7 @@
         "actor":1e-4,
         "critic":1e-4
     },
-    "weight_decay":0,
+    "weight_decay": 0,
 
     "learn_per_step": 20,
     "update_times": 10,

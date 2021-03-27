@@ -1,0 +1,11 @@
+Job started at 2021-03-26 16:43:40.362222
+Episode 100	Average Score: 15.19
+Episode 200	Average Score: 29.39
+Episode 209	Average Score: 30.06
+Episode 209	Average Score: 30.06
+Min: 0.5364999880082906
+Max: 34.21149923531338
+Count: 209
+Avg: 22.72440379829008
+Std: 9.238333638550284
+Job finished at 2021-03-27 06:28:55.872674
