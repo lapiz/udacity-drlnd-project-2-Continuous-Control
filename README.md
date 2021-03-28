@@ -4,7 +4,11 @@ This repository contains an implementation of project 2 for [Udacity's Deep Rein
 
 ## Project Details
 
-TBD
+In this project, I trained agents with double-jointed arm, According to project introduciton, a double-jointed arm can move to target locations. A reward of +0.1 is provided for each step that the agent's hand is in the goal location. Thus, the goal of your agent is to maintain its position at the target location for as many time steps as possible.
+
+The observation space consists of 33 variables corresponding to position, rotation, velocity, and angular velocities of the arm. Each action is a vector with four numbers, corresponding to torque applicable to two joints. Every entry in the action vector should be a number between -1 and 1.
+
+Project have two options, Single agent vs 20 agents. I challenge to 20 agents. My all agents get an average score of +30 over 100 consecutive episodes.
 
 ## Getting Started
 
@@ -46,7 +50,16 @@ Different versions of the Unity environment are required on different operationa
   
 ## Instructions
 
-TBD
+- Command lines
+  - If train yourself, run it. you can skip hparam filename, it found 'default.json' file.
+
+```bash
+python train.py hparam.json
+```
+
+- Notebook
+  - If train, open [Continuous_Control.ipynb](Continuous_Control.ipynb)
+  - If run with already trained data, open [run_trained.ipynb](run_trained.ipynb)
 
 ## Files
 
@@ -59,5 +72,28 @@ TBD
   - Main notebook file.
   - Based on udacity project skelecton notebook
   - I implemented my agent and some helper classes.
+- run_trained.ipynb
+  - Run with trained data sample
+- Report.ipynb
+  - My Project report.
+  - Include these things
+    - Learning Algorithm
+      - Hyperpameters
+      - Model architechures
+    - Plot of Rewards
+- reacher_result_actor.pth
+  - trained model weights for actor
+- reacher_result_critic.pth
+  - trained model weights for critic
 - scores.py
   - helper code for score data
+- train.py
+  - Train ddpg agents.
+  - Based on udacity DRLND ddqg-bipdel sample project
+  - Run ommand line with hparam json arguments for test
+- ddpg_agent.py
+  - DDPG Agent implementation with PlayBuffer
+  - Based on udacity DRLND ddqg-bipdel sample project
+  - Modifiied for sharing models with 20 agents.
+- model.py
+  - Model described by hidden layers (Actor and Critic)
