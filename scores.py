@@ -22,7 +22,7 @@ class Scores():
         print(F'\r[{datetime.now()}] Episode {self.episode}\tScore: {score:.2f}\tAverage Score: {window_mean:.2f}')
         if self.episode % self.window_size == 0:
             self.scores_log.append( (self.episode, window_mean) )
-        if window_mean >= self.expected:
+        if window_mean >= self.expected and len(self.scores_window) >= self.window_size:
             if self.check_solved:
                 print(F'\n[{datetime.now()}] Environment solved in {self.episode-self.window_size:d} episodes!\tAverage Score: {window_mean:.2f}')
                 self.scores_log.append( (self.episode, window_mean) )
